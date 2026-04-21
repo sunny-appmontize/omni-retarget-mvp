@@ -1,4 +1,5 @@
 "use client";
+
 import { useState } from "react";
 import Link from "next/link";
 import {
@@ -10,150 +11,272 @@ import {
   Settings,
   Bell,
   HelpCircle,
-  Menu,
   LogOut,
   Plus,
+  ChevronsRight,
+  ChevronsLeft,
+  ChartColumnBig,
+  ChevronUp,
+  User,
+  ChevronRight,
 } from "lucide-react";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+  DropdownMenuGroup,
+} from "@/components/ui/dropdown-menu";
+
+import { Button } from "@/components/ui/button";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { cn } from "@/lib/utils";
+import { ModeToggle } from "@/components/ModeToggle";
+import { usePathname } from "next/navigation";
+import { Card } from "@/components/ui/card";
 
 export default function DashboardLayout({ children }) {
   const [isCollapsed, setIsCollapsed] = useState(false);
+  const pathname = usePathname();
+
+  const formatSegment = (segment) => {
+    return segment.replace("-", " ").replace(/\b\w/g, (c) => c.toUpperCase());
+  };
+
+  const segments = pathname.split("/").filter(Boolean);
 
   return (
-    <div className="flex h-screen bg-[#F8FAFC] font-sans text-slate-900 overflow-hidden">
-      {/* LUXURY SIDEBAR */}
+    <div className="flex h-screen bg-background font-sans text-foreground overflow-hidden">
+      {/* PERMANENTLY DARK SIDEBAR (Using exact oklch raw values) */}
       <aside
-        className={`bg-slate-950 text-slate-400 transition-all duration-300 ease-in-out border-r border-slate-800/50 flex flex-col relative z-20 shadow-xl shadow-slate-900/10 ${
-          isCollapsed ? "w-20" : "w-64"
-        }`}
+        className={cn(
+          "bg-[oklch(0.214_0.009_43.1)] text-[oklch(0.986_0.002_67.8)] transition-all duration-300 ease-in-out flex flex-col relative z-20 ",
+          isCollapsed ? "w-[60px]" : "w-[180px]",
+        )}
       >
-        {/* Top Control - Expand/Collapse (No Logo) */}
-        <div className="h-16 flex items-center justify-center px-4 border-b border-white/5">
-          <button
+        {/* Toggle Button */}
+        <div className="h-auto flex items-center justify-center px-4 absolute -top-1 -right-8">
+          <Button
+            variant="ghost"
+            size="icon"
             onClick={() => setIsCollapsed(!isCollapsed)}
-            className="p-2 rounded-lg text-slate-400 hover:text-white hover:bg-white/5 transition-all duration-200 w-full flex justify-center"
-            title="Toggle Sidebar"
+            className="text-[oklch(0.714_0.014_41.2)] hover:text-[oklch(0.986_0.002_67.8)] rounded-r-full pl-2 pr-1 bg-[oklch(0.214_0.009_43.1)] w-full hover:bg-[oklch(0.214_0.009_43.1)] "
           >
-            <Menu size={20} />
-          </button>
+            {isCollapsed ? (
+              <ChevronsRight size={20} />
+            ) : (
+              <ChevronsLeft size={20} />
+            )}
+          </Button>
         </div>
 
-        {/* Navigation & Actions Container */}
-        <div className="flex-1 overflow-y-auto py-6 flex flex-col gap-6 custom-scrollbar">
-          {/* Highlighted Action Button */}
-          <div className="px-4">
-            <button
-              className={`flex items-center justify-center gap-2 w-full bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl transition-all duration-200 shadow-lg shadow-indigo-600/20 group ${
-                isCollapsed ? "py-3" : "py-3 px-4"
-              }`}
+        {/* Navigation & Actions */}
+        <div className="flex-1 overflow-y-auto py-8 flex flex-col gap-2 custom-scrollbar">
+          <div className="pl-1 pr-2 mb-4">
+            <Button
+              className={cn(
+                "w-full bg-[oklch(0.438_0.218_303.724)] hover:bg-[oklch(0.438_0.218_303.724)/90%] text-[oklch(0.977_0.014_308.299)] shadow-md group transition-all duration-300 flex items-center border-0",
+                isCollapsed
+                  ? "py-4 px-2 justify-center rounded-full"
+                  : "py-5 px-4 justify-start rounded-xl",
+              )}
             >
               <Plus
                 size={20}
-                className="transition-transform group-hover:rotate-90 duration-300"
+                className={cn(
+                  "transition-all duration-300 group-hover:rotate-90 shrink-0",
+                  !isCollapsed && "mr-2",
+                )}
               />
-              {!isCollapsed && (
-                <span className="font-medium text-sm tracking-wide">
-                  Create New
-                </span>
-              )}
-            </button>
+              <span
+                className={cn(
+                  "font-medium text-xs tracking-wide transition-all duration-300 whitespace-nowrap",
+                  isCollapsed
+                    ? "opacity-0 translate-x-2 absolute"
+                    : "opacity-100 translate-x-0 delay-100",
+                )}
+              >
+                Create New
+              </span>
+            </Button>
           </div>
 
-          {/* Main Navigation */}
-          <nav className="flex-1 space-y-1 mt-2">
+          <nav className="flex-1 space-y-1">
             <NavItem
               href="/dashboard"
-              icon={<LayoutDashboard size={20} />}
+              icon={<LayoutDashboard size={18} />}
               label="Dashboard"
-              active={true} // Set this dynamically in your real app
+              active={pathname === "/dashboard"}
               isCollapsed={isCollapsed}
             />
             <NavItem
-              href="/audiences"
-              icon={<Users size={20} />}
+              href="/dashboard/analytics"
+              icon={<ChartColumnBig size={18} />}
+              label="Analytics"
+              active={pathname == "/dashboard/analytics"}
+              isCollapsed={isCollapsed}
+            />
+            <NavItem
+              href="/dashboard/audiences"
+              icon={<Users size={18} />}
               label="Audience"
+              active={pathname == "/dashboard/audiences"}
               isCollapsed={isCollapsed}
             />
             <NavItem
-              href="/announcements"
-              icon={<Megaphone size={20} />}
+              href="/dashboard/announcements"
+              icon={<Megaphone size={18} />}
               label="Announcements"
+              active={pathname === "/dashboard/announcements"}
               isCollapsed={isCollapsed}
             />
             <NavItem
-              href="/reports"
-              icon={<FileText size={20} />}
+              href="/dashboard/reports"
+              icon={<FileText size={18} />}
               label="Reports"
+              active={pathname === "/dashboard/reports"}
               isCollapsed={isCollapsed}
             />
             <NavItem
-              href="/templates"
-              icon={<MessageSquare size={20} />}
+              href="/dashboard/templates"
+              icon={<MessageSquare size={18} />}
               label="Templates"
-              isCollapsed={isCollapsed}
-            />
-          </nav>
-
-          {/* System Navigation */}
-          <nav className="space-y-1 pb-4 border-t border-white/5 pt-4">
-            <NavItem
-              href="/settings"
-              icon={<Settings size={20} />}
-              label="Settings"
+              active={pathname === "/dashboard/templates"}
               isCollapsed={isCollapsed}
             />
           </nav>
         </div>
 
-        {/* User Profile Footer */}
-        <div className="p-4 border-t border-white/5 bg-slate-950/50">
-          <div
-            className={`flex items-center gap-3 p-2 rounded-xl hover:bg-white/5 transition-colors cursor-pointer ${isCollapsed ? "justify-center" : ""}`}
-          >
-            <div className="h-9 w-9 rounded-full bg-gradient-to-tr from-indigo-500 to-purple-500 text-white flex items-center justify-center text-sm font-bold shadow-md shrink-0 ring-2 ring-slate-950">
-              JS
-            </div>
-            {!isCollapsed && (
-              <div className="flex-1 min-w-0">
-                <p className="text-sm font-medium text-white truncate">
-                  John Smith
-                </p>
-                <p className="text-xs text-slate-500 truncate">Admin</p>
+        {/* User Profile */}
+        <div className="p-4 border-t border-[oklch(1_0_0/10%)] bg-[oklch(0.214_0.009_43.1)]">
+          <DropdownMenu>
+            <DropdownMenuTrigger className="w-full border-none bg-transparent p-0 outline-none">
+              <div
+                className={cn(
+                  "flex items-center gap-3 p-2 w-full rounded-xl hover:bg-[oklch(0.268_0.011_36.5)] hover:text-[oklch(0.986_0.002_67.8)] transition-all cursor-pointer group text-left",
+                  isCollapsed && "justify-center",
+                )}
+              >
+                <Avatar className="h-9 w-9 ring-2 ring-[oklch(1_0_0/10%)] shadow-md transition-transform group-hover:scale-105">
+                  <AvatarImage src="" />
+                  <AvatarFallback className="bg-[oklch(0.438_0.218_303.724)] text-[oklch(0.977_0.014_308.299)] text-xs font-bold">
+                    SP
+                  </AvatarFallback>
+                </Avatar>
+
+                {!isCollapsed && (
+                  <>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-xs font-semibold text-[oklch(0.986_0.002_67.8)] truncate">
+                        Sunny Patel
+                      </p>
+                      <p className="text-[10px] text-[oklch(0.714_0.014_41.2)] truncate">
+                        Admin
+                      </p>
+                    </div>
+                    <ChevronUp
+                      size={16}
+                      className="text-[oklch(0.714_0.014_41.2)]"
+                    />
+                  </>
+                )}
               </div>
-            )}
-            {!isCollapsed && (
-              <LogOut
-                size={16}
-                className="text-slate-500 hover:text-white transition-colors"
-              />
-            )}
-          </div>
+            </DropdownMenuTrigger>
+
+            <DropdownMenuContent
+              align={isCollapsed ? "center" : "end"}
+              side={isCollapsed ? "right" : "top"}
+              className={`w-38 mb-2 ${isCollapsed ? "ml-2" : ""}`}
+            >
+              <DropdownMenuGroup>
+                <DropdownMenuLabel>My Account</DropdownMenuLabel>
+                <DropdownMenuSeparator />
+
+                <DropdownMenuItem className="cursor-pointer">
+                  <User className="mr-2 h-4 w-4" />
+                  <span>Profile</span>
+                </DropdownMenuItem>
+                <DropdownMenuItem className="cursor-pointer">
+                  <Settings className="mr-2 w-4" />
+                  <span>Settings</span>
+                </DropdownMenuItem>
+
+                <DropdownMenuSeparator />
+
+                <DropdownMenuItem className="cursor-pointer text-destructive focus:text-destructive focus:bg-destructive/10">
+                  <LogOut className="mr-2 w-4" />
+                  <span>Log out</span>
+                </DropdownMenuItem>
+              </DropdownMenuGroup>
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
       </aside>
 
       {/* MAIN CONTENT AREA */}
-      <div className="flex-1 flex flex-col min-w-0 bg-white shadow-[-10px_0_15px_-3px_rgba(0,0,0,0.03)] z-10 rounded-l-2xl -ml-2 my-2 border border-slate-200/60">
-        <header className="h-16 bg-transparent border-b border-slate-100 flex items-center justify-between px-8">
-          <div className="flex items-center gap-2 text-sm font-medium text-slate-500">
-            <span>Workspace</span>
-            <span className="text-slate-300">/</span>
-            <span className="text-slate-800 font-semibold tracking-tight">
-              Dashboard
-            </span>
-          </div>
+      <div className="flex-1 flex flex-col min-w-0 bg-background z-10 relative">
+        <main className="flex-1 overflow-auto px-8 space-y-5">
+          <Card className="flex flex-row items-center justify-between w-full h-10 px-4 py-2 rounded-b-xl rounded-t-none bg-card shadow-none  z-10">
+            {/* LEFT SIDE: Breadcrumbs */}
+            <nav aria-label="breadcrumb" className="flex items-center text-xs">
+              {segments.length === 0 ? (
+                <span className="font-semibold text-foreground">Dashboard</span>
+              ) : (
+                <ol className="flex items-center gap-1.5">
+                  {segments.map((seg, i) => {
+                    const href = "/" + segments.slice(0, i + 1).join("/");
+                    const isLast = i === segments.length - 1;
 
-          <div className="flex items-center gap-4">
-            <button className="relative p-2 text-slate-400 hover:text-slate-700 hover:bg-slate-50 rounded-full transition-all">
-              <Bell size={18} />
-              <span className="absolute top-2 right-2 h-2 w-2 bg-rose-500 border-2 border-white rounded-full"></span>
-            </button>
-            <button className="p-2 text-slate-400 hover:text-slate-700 hover:bg-slate-50 rounded-full transition-all">
-              <HelpCircle size={18} />
-            </button>
-          </div>
-        </header>
+                    return (
+                      <li key={i} className="flex items-center gap-1.5">
+                        {i > 0 && (
+                          <ChevronRight className="h-4 w-4 text-muted-foreground/50" />
+                        )}
 
-        <main className="flex-1 overflow-auto p-8">
-          <div className="max-w-7xl mx-auto">{children}</div>
+                        {isLast ? (
+                          <span className="text-foreground font-semibold">
+                            {formatSegment(seg)}
+                          </span>
+                        ) : (
+                          <Link
+                            href={href}
+                            className="text-muted-foreground hover:text-accent transition-colors"
+                          >
+                            {formatSegment(seg)}
+                          </Link>
+                        )}
+                      </li>
+                    );
+                  })}
+                </ol>
+              )}
+            </nav>
+
+            {/* RIGHT SIDE: Actions */}
+            <div className="flex items-center gap-2">
+              <ModeToggle />
+
+              <Button
+                variant="ghost"
+                size="icon"
+                className="relative text-muted-foreground hover:text-foreground hover:bg-accent rounded-full transition-colors h-9 w-9"
+              >
+                <Bell size={18} />
+                <span className="absolute top-2 right-2 h-2 w-2 bg-destructive border-2 border-background rounded-full"></span>
+              </Button>
+
+              <Button
+                variant="ghost"
+                size="icon"
+                className="text-muted-foreground hover:text-foreground hover:bg-accent rounded-full transition-colors h-9 w-9"
+              >
+                <HelpCircle size={18} />
+              </Button>
+            </div>
+          </Card>
+          <div className="mx-auto">{children}</div>
         </main>
       </div>
     </div>
@@ -162,30 +285,50 @@ export default function DashboardLayout({ children }) {
 
 function NavItem({ href, icon, label, active = false, isCollapsed }) {
   return (
-    <Link
-      href={href}
-      className={`relative flex items-center gap-3 py-3 transition-all duration-200 group mx-3 rounded-lg overflow-hidden ${
-        active
-          ? "bg-indigo-500/10 text-white"
-          : "text-slate-400 hover:bg-white/5 hover:text-slate-200"
-      } ${isCollapsed ? "justify-center px-0" : "px-4"}`}
-    >
-      {/* Luxury active strip indicator */}
-      {active && (
-        <div className="absolute left-0 top-0 bottom-0 w-1 bg-indigo-500 rounded-r-full shadow-[0_0_10px_rgba(99,102,241,0.5)]"></div>
-      )}
-
-      <span
-        className={`relative z-10 transition-colors ${active ? "text-indigo-400" : "group-hover:text-slate-300"}`}
+    <div className="relative pl-1">
+      {/* Spacer to push tab away from left edge */}
+      <Link
+        href={href}
+        className={cn(
+          "relative flex items-center gap-3 py-3 group",
+          // The ACTIVE state stays dynamic to the page background. The INACTIVE state is forced dark.
+          active
+            ? "bg-background text-foreground rounded-l-xl z-20"
+            : "text-[oklch(0.714_0.014_41.2)] hover:text-[oklch(0.986_0.002_67.8)] hover:bg-[oklch(0.268_0.011_36.5)] rounded-xl mr-3",
+          isCollapsed ? "justify-center px-0" : "px-4",
+        )}
       >
-        {icon}
-      </span>
-
-      {!isCollapsed && (
-        <span className="relative z-10 font-medium text-sm tracking-wide">
-          {label}
+        <span
+          className={cn(
+            "relative z-10 transition-colors duration-200",
+            // The ACTIVE icon color stays primary. The INACTIVE icon color uses the forced dark hover state.
+            active
+              ? "text-primary"
+              : "group-hover:text-[oklch(0.986_0.002_67.8)]",
+          )}
+        >
+          {icon}
         </span>
+
+        {!isCollapsed && (
+          <span
+            className={cn(
+              "relative z-10 font-medium text-xs tracking-wide",
+              active && "font-bold",
+            )}
+          >
+            {label}
+          </span>
+        )}
+      </Link>
+
+      {/* INVERSE CURVES - Dynamically inherits the global background color from theme so it matches the light/dark page exactly */}
+      {active && (
+        <>
+          <div className="absolute right-0 -top-4 w-4 h-4 bg-transparent rounded-br-xl shadow-[5px_5px_0_5px_var(--color-background)] z-10 pointer-events-none" />
+          <div className="absolute right-0 -bottom-4 w-4 h-4 bg-transparent rounded-tr-xl shadow-[5px_-5px_0_5px_var(--color-background)] z-10 pointer-events-none" />
+        </>
       )}
-    </Link>
+    </div>
   );
 }
