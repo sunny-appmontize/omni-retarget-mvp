@@ -19,6 +19,7 @@ import {
   ChevronUp,
   User,
   ChevronRight,
+  CircleUserRound,
 } from "lucide-react";
 import {
   DropdownMenu,
@@ -36,9 +37,10 @@ import { cn } from "@/lib/utils";
 import { ModeToggle } from "@/components/ModeToggle";
 import { usePathname } from "next/navigation";
 import { Card } from "@/components/ui/card";
+import { logoutUser } from "@/actions/auth";
 
 export default function DashboardLayout({ children }) {
-  const [isCollapsed, setIsCollapsed] = useState(false);
+  const [isCollapsed, setIsCollapsed] = useState(true);
   const pathname = usePathname();
 
   const formatSegment = (segment) => {
@@ -46,6 +48,10 @@ export default function DashboardLayout({ children }) {
   };
 
   const segments = pathname.split("/").filter(Boolean);
+
+  const handleLogout = async () => {
+    await logoutUser();
+  };
 
   return (
     <div className="flex h-screen bg-background font-sans text-foreground overflow-hidden">
@@ -195,19 +201,29 @@ export default function DashboardLayout({ children }) {
                 <DropdownMenuSeparator />
 
                 <DropdownMenuItem className="cursor-pointer">
-                  <User className="mr-2 h-4 w-4" />
-                  <span>Profile</span>
+                  <Link href={"/accounts"} className="flex items-center">
+                    <Settings className="mr-2 h-5 w-5" />
+                    <span>Settings</span>
+                  </Link>
                 </DropdownMenuItem>
-                <DropdownMenuItem className="cursor-pointer">
-                  <Settings className="mr-2 w-4" />
-                  <span>Settings</span>
-                </DropdownMenuItem>
+                {/* <DropdownMenuItem className="cursor-pointer">
+                  <Link href={"/user/settings"} className="flex">
+                    <Settings className="mr-2 w-4" />
+                    <span>Settings</span>
+                  </Link>
+                </DropdownMenuItem> */}
 
                 <DropdownMenuSeparator />
 
                 <DropdownMenuItem className="cursor-pointer text-destructive focus:text-destructive focus:bg-destructive/10">
-                  <LogOut className="mr-2 w-4" />
-                  <span>Log out</span>
+                  <Button
+                    onClick={handleLogout}
+                    variant="destrective"
+                    className={"w-full justify-start p-0 h-auto cursor-pointer"}
+                  >
+                    <LogOut className="mr-2 w-4" />
+                    <span>Logout</span>
+                  </Button>
                 </DropdownMenuItem>
               </DropdownMenuGroup>
             </DropdownMenuContent>

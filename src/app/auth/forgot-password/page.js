@@ -103,7 +103,7 @@ export default function ForgotPasswordPage() {
 
       <div className="flex justify-center lg:justify-start">
         <Link
-          href="/auth/login"
+          href="/auth"
           className="flex items-center text-xs font-medium text-muted-foreground hover:text-foreground transition-colors group"
         >
           <ArrowLeft

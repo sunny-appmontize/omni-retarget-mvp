@@ -3,14 +3,18 @@
 import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { useTheme } from "next-themes"; // Added for mode toggle
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Loader2 } from "lucide-react";
+import { Loader2, Sun, Moon, AlertCircle } from "lucide-react"; // Added new icons
+import { loginUser } from "@/actions/auth";
 
 export default function LoginPage() {
   const router = useRouter();
+  const { theme, setTheme } = useTheme(); // Hook to control dark/light mode
   const [isLoading, setIsLoading] = useState(false);
+  const [errorMsg, setErrorMsg] = useState("");
   const [formData, setFormData] = useState({
     email: "",
     password: "",
@@ -23,26 +27,39 @@ export default function LoginPage() {
   const handleLogin = async (e) => {
     e.preventDefault();
     setIsLoading(true);
+    setErrorMsg("");
 
     try {
-      // TODO: Replace with your actual API/Auth call
-      // const response = await signIn("credentials", { ...formData, redirect: false });
+      const response = await loginUser(formData);
 
-      // Simulating network request
-      await new Promise((resolve) => setTimeout(resolve, 1500));
-
-      // On success, redirect to dashboard
-      router.push("/dashboard/audiences");
+      if (response.success) {
+        router.push("/dashboard");
+      } else {
+        setErrorMsg(response.error);
+      }
     } catch (error) {
-      console.error("Login failed:", error);
-      // TODO: Trigger error toast here
+      setErrorMsg("Something went wrong. Please try again.");
     } finally {
       setIsLoading(false);
     }
   };
 
   return (
-    <div className="w-full max-w-md mx-auto space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
+    /* Added relative here so the toggle button positions correctly if you want it inside the container, 
+       but I used 'fixed' below so it stays in the top right of the whole screen. */
+    <div className="w-full max-w-md mx-auto space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500 relative">
+      {/* --- FLOATING MODE TOGGLE --- */}
+      <Button
+        variant="ghost"
+        size="icon"
+        className="fixed top-4 right-4 sm:top-8 sm:right-8 text-muted-foreground hover:text-foreground"
+        onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
+      >
+        <Sun className="h-5 w-5 rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
+        <Moon className="absolute h-5 w-5 rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
+        <span className="sr-only">Toggle theme</span>
+      </Button>
+
       <div className="space-y-2 text-center lg:text-left">
         <h2 className="text-2xl font-bold tracking-tight text-foreground">
           Welcome back
@@ -56,7 +73,6 @@ export default function LoginPage() {
         {/* Google OAuth Button */}
         <Button
           variant="outline"
-          // Let shadcn handle the outline colors automatically
           className="w-full h-10 text-sm font-medium text-foreground cursor-pointer"
           disabled={isLoading}
         >
@@ -92,6 +108,14 @@ export default function LoginPage() {
           </div>
         </div>
 
+        {/* --- INLINE ERROR DISPLAY --- */}
+        {errorMsg && (
+          <div className="p-3 rounded-md bg-destructive/10 border border-destructive/20 flex items-center gap-2 text-sm text-destructive animate-in fade-in slide-in-from-top-2">
+            <AlertCircle className="h-4 w-4 flex-shrink-0" />
+            <p>{errorMsg}</p>
+          </div>
+        )}
+
         {/* Standard Auth Form */}
         <form className="space-y-4" onSubmit={handleLogin}>
           <div className="space-y-2">
@@ -105,7 +129,6 @@ export default function LoginPage() {
               id="email"
               type="email"
               placeholder="name@company.com"
-              // Removed bg-card so it uses your dark mode --input and --background vars natively
               className="h-10 text-sm text-foreground"
               value={formData.email}
               onChange={handleInputChange}
@@ -140,7 +163,7 @@ export default function LoginPage() {
           </div>
           <Button
             type="submit"
-            className="w-full h-10 text-sm font-semibold"
+            className="w-full h-10 text-sm font-semibold mt-2"
             disabled={isLoading}
           >
             {isLoading ? (

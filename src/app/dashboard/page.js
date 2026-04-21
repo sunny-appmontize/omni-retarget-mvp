@@ -92,43 +92,6 @@ export default function DashboardPage() {
 
   return (
     <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-700">
-      {/* PAGE HEADER */}
-      {/* <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-        <div>
-          <h2 className="text-xl font-bold tracking-tight text-foreground">
-            Overview
-          </h2>
-          <p className="text-xs text-muted-foreground mt-1">
-            Monitor your programmatic campaign performance.
-          </p>
-        </div>
-        <div className="flex items-center gap-3">
-          <div className="flex bg-muted/50 p-1 rounded-md border border-border">
-            {["7D", "30D", "90D"].map((t) => (
-              <button
-                key={t}
-                onClick={() => setTimeframe(t)}
-                className={`px-2.5 py-1 text-xs font-medium rounded transition-all ${
-                  timeframe === t
-                    ? "bg-background text-foreground shadow-sm"
-                    : "text-muted-foreground hover:text-foreground"
-                }`}
-              >
-                {t}
-              </button>
-            ))}
-          </div>
-          <Button
-            variant="outline"
-            size="sm"
-            className="h-7 px-3 text-xs gap-1.5"
-          >
-            <Download size={14} />
-            Export
-          </Button>
-        </div>
-      </div> */}
-
       {/* KPI METRIC CARDS */}
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
         <KpiCard
@@ -174,13 +137,9 @@ export default function DashboardPage() {
             </CardDescription>
           </CardHeader>
           <CardContent className="pl-0 pb-4">
-            <div className="h-[250px] w-full mt-4">
-              <ResponsiveContainer
-                width="100%"
-                height="100%"
-                minHeight={250}
-                minWidth={0}
-              >
+            <div className="w-full mt-4">
+              {/* FIX: Set static height of 250 here and minWidth={0} */}
+              <ResponsiveContainer width="100%" height={250} minWidth={0}>
                 <AreaChart
                   data={performanceData}
                   margin={{ top: 10, right: 30, left: 0, bottom: 0 }}
@@ -265,8 +224,9 @@ export default function DashboardPage() {
             </CardDescription>
           </CardHeader>
           <CardContent className="pb-4">
-            <div className="h-[250px] w-full mt-4">
-              <ResponsiveContainer width="100%" height="100%">
+            <div className="w-full mt-4">
+              {/* FIX: Set static height of 250 here and minWidth={0} */}
+              <ResponsiveContainer width="100%" height={250} minWidth={0}>
                 <BarChart
                   data={performanceData}
                   margin={{ top: 10, right: 10, left: -20, bottom: 0 }}

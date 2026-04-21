@@ -6,7 +6,7 @@ export async function getUserProfileData(userId) {
   // const user = await db.users.findUnique({ where: { id: userId } });
   // if (!user) throw new Error("User not found");
   // return user;
-  await new Promise((resolve) => setTimeout(resolve, 5000)); // Fake network delay
+  await new Promise((resolve) => setTimeout(resolve, 3000)); // Fake network delay
 
   // Simulated for now:
   return {

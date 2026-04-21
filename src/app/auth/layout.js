@@ -12,10 +12,8 @@ export default function AuthLayout({ children }) {
         </div>
 
         <div className="relative z-10 flex items-center gap-2 text-white">
-          <div className="bg-indigo-600 p-2 rounded-lg">
-            <Zap size={20} className="text-white" />
-          </div>
-          <span className="text-xl font-bold tracking-tight">OmniTarget</span>
+          <Zap size={20} className="text-white" />
+          <span className="text-xl font-bold tracking-tight">OT</span>
         </div>
 
         <div className="relative z-10 space-y-6 max-w-md">
